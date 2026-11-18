@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="gqr_logo.jpg" alt="gqr logo" width="240">
+</p>
+
 # gqr
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/wisebrian/gqr.svg)](https://pkg.go.dev/github.com/wisebrian/gqr)
