@@ -1,0 +1,4 @@
+# The command, built with go build -o gqr ./cmd/gqr, and codes made with it.
+/gqr
+/*.png
+/*.svg
