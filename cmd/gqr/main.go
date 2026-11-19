@@ -225,6 +225,10 @@ func writeFile(name string, code *gqr.Code, opts *gqr.Options) error {
 		err = code.WritePNG(&buf, opts)
 	}
 	if errors.Is(err, gqr.ErrLogoTooLarge) {
+		if code.Level() == gqr.High {
+			// The code is at level H already, so -l H would make the same one.
+			return fmt.Errorf("%w; try a smaller -logo-size", err)
+		}
 		return fmt.Errorf("%w; try a smaller -logo-size or -l H", err)
 	}
 	if err != nil {
