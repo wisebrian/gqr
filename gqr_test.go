@@ -58,6 +58,22 @@ func TestEncodeRaisesLevel(t *testing.T) {
 	}
 }
 
+// EncodeBytes always uses byte mode: 20 digits take version 1 as a numeric
+// segment, but version 2 as bytes.
+func TestEncodeBytes(t *testing.T) {
+	digits := strings.Repeat("1", 20)
+	c, err := EncodeBytes([]byte(digits), Low)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.Version() != 2 {
+		t.Errorf("EncodeBytes: version %d, want 2", c.Version())
+	}
+	if v := mustEncode(t, digits, Low).Version(); v != 1 {
+		t.Errorf("Encode: version %d, want 1", v)
+	}
+}
+
 func TestEncodeErrors(t *testing.T) {
 	if _, err := Encode(strings.Repeat("a", 2954), Low); !errors.Is(err, ErrTooLong) {
 		t.Errorf("too long: err = %v, want ErrTooLong", err)
