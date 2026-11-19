@@ -137,3 +137,20 @@ func TestHugeLogo(t *testing.T) {
 		t.Errorf("embedded logo is %dx%d, want %dx%d", cfg.Width, cfg.Height, maxSVGLogo, maxSVGLogo)
 	}
 }
+
+// A logo without pixels is accepted and draws nothing, in an SVG as in an
+// image.
+func TestEmptyLogo(t *testing.T) {
+	c := mustEncode(t, "https://go.dev", High)
+	opts := &Options{Logo: image.NewGray(image.Rectangle{})}
+	if _, err := c.Image(opts); err != nil {
+		t.Errorf("Image: %v", err)
+	}
+	var buf bytes.Buffer
+	if err := c.WriteSVG(&buf, opts); err != nil {
+		t.Fatalf("WriteSVG: %v", err)
+	}
+	if strings.Contains(buf.String(), "<image") {
+		t.Error("the SVG embeds the empty logo")
+	}
+}

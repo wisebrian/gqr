@@ -99,6 +99,36 @@ func TestRun(t *testing.T) {
 	}
 }
 
+// When a logo does not fit, -l H is suggested only if it would change the
+// code.
+func TestLogoHint(t *testing.T) {
+	dir := t.TempDir()
+	logo := filepath.Join(dir, "logo.png")
+	var buf bytes.Buffer
+	if err := png.Encode(&buf, image.NewGray(image.Rect(0, 0, 16, 16))); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(logo, buf.Bytes(), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	tests := []struct {
+		text, want string
+	}{
+		// The text fills a 1-M code, too small for the logo. At level H it
+		// takes version 2, which has room.
+		{"https://go.dev", "try a smaller -logo-size or -l H"},
+		// A short text is raised to level H already.
+		{"hi", "try a smaller -logo-size"},
+	}
+	for _, tt := range tests {
+		args := []string{"-o", filepath.Join(dir, "qr.png"), "-logo", logo, tt.text}
+		err := run(args, strings.NewReader(""), io.Discard, io.Discard)
+		if err == nil || !strings.HasSuffix(err.Error(), tt.want) {
+			t.Errorf("%q: err = %v, want one ending in %q", tt.text, err, tt.want)
+		}
+	}
+}
+
 // endless is standard input that never ends, like /dev/zero. It gives up
 // after 16 MiB, which only a run that reads without a limit would reach.
 type endless struct{ n int }

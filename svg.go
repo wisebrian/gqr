@@ -44,7 +44,9 @@ func (c *Code) WriteSVG(w io.Writer, o *Options) error {
 	}
 	bw.WriteString("\"/>\n")
 
-	if r.logo != nil {
+	// A logo without pixels still clears its modules but, as in Image, draws
+	// nothing.
+	if r.logo != nil && !r.logo.Bounds().Empty() {
 		// Leave half a module of background around the logo, as Image does.
 		b := r.hole.Add(image.Pt(QuietZone, QuietZone))
 		fmt.Fprintf(bw, `<image x="%g" y="%g" width="%d" height="%d" xlink:href="data:image/png;base64,`,
